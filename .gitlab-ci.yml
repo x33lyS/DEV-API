@@ -1,0 +1,24 @@
+image: node:16
+
+stages:
+  - quality
+  - deploy
+
+lint:
+  stage: quality
+  script:
+    - npm ci
+    - npm run lint
+
+test:
+  stage: quality
+  script:
+    - npm ci
+    - npm run test
+
+heroku:
+  stage: deploy
+  image: ruby:2.6
+  script:
+    - gem install dpl
+    - dpl --provider=heroku --app=ingesup-b3-dev-api --api-key=$HEROKU_API_KEY

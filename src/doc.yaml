@@ -1,0 +1,314 @@
+openapi: 3.0.3
+info:
+  title: Library API
+  description: Fetch and create your books
+  version: 1.0.0
+tags:
+  - name: auth
+    description: Authentication operations
+  - name: book
+    description: Book CRUD operations
+components:
+  schemas:
+    AuthenticationCredentials:
+      required:
+        - username
+        - password
+      type: object
+      properties:
+        username:
+          type: string
+          example: user
+        password:
+          type: string
+          example: pwd
+    AuthenticationToken:
+      required:
+        - token
+      type: object
+      properties:
+        token:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImlhdCI6MTY2ODQ0MTEzMiwiZXhwIjoxNjY4NDQ0NzMyfQ.g-UvWR4tJgbZq7-i2Wm2aiOsVxfzJ05lGKhQ9kKhCvE
+    AppException:
+      required:
+        - code
+        - message
+      type: object
+      properties:
+        code:
+          type: integer
+        message:
+          type: string
+    BookRead:
+      required:
+        - id
+        - title
+        - publication
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: JavaScript pour les noobs
+        publication:
+          type: string
+          format: date
+          example: 1996-05-01
+    BookCreate:
+      required:
+        - title
+        - publication
+      type: object
+      properties:
+        title:
+          type: string
+          example: JavaScript pour les noobs
+        publication:
+          type: string
+          format: date
+          example: 1996-05-01
+    BookReplace:
+      $ref: '#/components/schemas/BookCreate'
+    BookUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+          example: JavaScript pour les noobs
+        publication:
+          type: string
+          format: date
+          example: 1996-05-01
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+paths:
+  /auth/login:
+    post:
+      tags:
+        - auth
+      description: Login
+      summary: Login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthenticationCredentials'
+      responses:
+        201:
+          description: Return authentication token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthenticationToken'
+        401:
+          description: Return Credentials exception
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppException'
+  /books:
+    get:
+      tags:
+        - book
+      description: Find books
+      summary: Find books
+      parameters:
+        - name: pageIndex
+          in: query
+          description: Page index
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+        - name: pageSize
+          in: query
+          description: Page size
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        200:
+          description: Returns a page of books
+          headers:
+            x-total-count:
+              description: Items total count
+              schema:
+                type: integer
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BookRead'
+    post:
+      tags:
+        - book
+      description: Create book
+      summary: Create book
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookCreate'
+      responses:
+        201:
+          description: Return created book
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookRead'
+        401:
+          description: Return Authentication token exception
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppException'
+      security:
+        - bearerAuth: []
+  /books/{id}:
+    get:
+      tags:
+        - book
+      description: Find a book
+      summary: Find a book
+      parameters:
+        - name: id
+          in: path
+          description: Book id
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+      responses:
+        200:
+          description: Return requested book
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookRead'
+        404:
+          description: Return Book not found exception
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppException'
+    patch:
+      tags:
+        - book
+      description: Update book
+      summary: Update book
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookUpdate'
+      parameters:
+        - name: id
+          in: path
+          description: Book id
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+      responses:
+        200:
+          description: Return updated book
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookRead'
+        401:
+          description: Return Authentication token exception
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppException'
+        404:
+          description: Return Book not found exception
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppException'
+      security:
+        - bearerAuth: []
+    put:
+      tags:
+        - book
+      description: Replace book
+      summary: Replace book
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookCreate'
+      parameters:
+        - name: id
+          in: path
+          description: Book id
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+      responses:
+        200:
+          description: Return replaced book
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookRead'
+        401:
+          description: Return Authentication token exception
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppException'
+        404:
+          description: Return Book not found exception
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppException'
+      security:
+        - bearerAuth: []
+    delete:
+      tags:
+        - book
+      description: Delete book
+      summary: Delete book
+      parameters:
+        - name: id
+          in: path
+          description: Book id
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+      responses:
+        204:
+          description: Return void
+        401:
+          description: Return Authentication token exception
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppException'
+        403:
+          description: Return Not allowed role exception
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppException'
+        404:
+          description: Return Book not found exception
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppException'
+      security:
+        - bearerAuth: []

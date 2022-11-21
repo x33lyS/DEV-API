@@ -1,0 +1,21 @@
+import express from 'express';
+import compression from 'compression';
+import helmet from 'helmet';
+import { appRouter } from './app.router.js';
+import { routeNotFoundMiddleware } from './common/route-not-found.middleware.js';
+import { errorMiddleware } from './common/error.middleware.js';
+import './common/database.config.js';
+import { serviceErrorMiddleware } from './common/service-error.middleware.js';
+import { requestLogger } from './common/logger.config.js';
+import swaggerUi from 'swagger-ui-express';
+import { swaggerConfig } from './common/swagger.config.js';
+
+export const app = express();
+app.use(compression());
+app.use(helmet());
+app.use(express.json());
+app.use(requestLogger);
+app.use(appRouter, serviceErrorMiddleware);
+app.use('/', swaggerUi.serve, swaggerUi.setup(swaggerConfig));
+app.use(routeNotFoundMiddleware);
+app.use(errorMiddleware);

@@ -1,0 +1,314 @@
+openapi: 3.0.3
+info:
+  title: Library API
+  description: Fetch and create your live-scores
+  version: 1.0.0
+tags:
+  - name: auth
+    description: Authentication operations
+  - name: live-score
+    description: live-score CRUD operations
+components:
+  schemas:
+    AuthenticationCredentials:
+      required:
+        - username
+        - password
+      type: object
+      properties:
+        username:
+          type: string
+          example: user
+        password:
+          type: string
+          example: pwd
+    AuthenticationToken:
+      required:
+        - token
+      type: object
+      properties:
+        token:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImlhdCI6MTY2ODQ0MTEzMiwiZXhwIjoxNjY4NDQ0NzMyfQ.g-UvWR4tJgbZq7-i2Wm2aiOsVxfzJ05lGKhQ9kKhCvE
+    AppException:
+      required:
+        - code
+        - message
+      type: object
+      properties:
+        code:
+          type: integer
+        message:
+          type: string
+    live-scoreRead:
+      required:
+        - id
+        - title
+        - publication
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: JavaScript pour les noobs
+        publication:
+          type: string
+          format: date
+          example: 1996-05-01
+    live-scoreCreate:
+      required:
+        - title
+        - publication
+      type: object
+      properties:
+        title:
+          type: string
+          example: JavaScript pour les noobs
+        publication:
+          type: string
+          format: date
+          example: 1996-05-01
+    live-scoreReplace:
+      $ref: '#/components/schemas/live-scoreCreate'
+    live-scoreUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+          example: JavaScript pour les noobs
+        publication:
+          type: string
+          format: date
+          example: 1996-05-01
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+paths:
+  /auth/login:
+    post:
+      tags:
+        - auth
+      description: Login
+      summary: Login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthenticationCredentials'
+      responses:
+        201:
+          description: Return authentication token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthenticationToken'
+        401:
+          description: Return Credentials exception
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppException'
+  /live-scores:
+    get:
+      tags:
+        - live-score
+      description: Find live-scores
+      summary: Find live-scores
+      parameters:
+        - name: pageIndex
+          in: query
+          description: Page index
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+        - name: pageSize
+          in: query
+          description: Page size
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        200:
+          description: Returns a page of live-scores
+          headers:
+            x-total-count:
+              description: Items total count
+              schema:
+                type: integer
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/live-scoreRead'
+    post:
+      tags:
+        - live-score
+      description: Create live-score
+      summary: Create live-score
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/live-scoreCreate'
+      responses:
+        201:
+          description: Return created live-score
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/live-scoreRead'
+        401:
+          description: Return Authentication token exception
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppException'
+      security:
+        - bearerAuth: []
+  /live-scores/{id}:
+    get:
+      tags:
+        - live-score
+      description: Find a live-score
+      summary: Find a live-score
+      parameters:
+        - name: id
+          in: path
+          description: live-score id
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+      responses:
+        200:
+          description: Return requested live-score
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/live-scoreRead'
+        404:
+          description: Return live-score not found exception
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppException'
+    patch:
+      tags:
+        - live-score
+      description: Update live-score
+      summary: Update live-score
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/live-scoreUpdate'
+      parameters:
+        - name: id
+          in: path
+          description: live-score id
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+      responses:
+        200:
+          description: Return updated live-score
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/live-scoreRead'
+        401:
+          description: Return Authentication token exception
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppException'
+        404:
+          description: Return live-score not found exception
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppException'
+      security:
+        - bearerAuth: []
+    put:
+      tags:
+        - live-score
+      description: Replace live-score
+      summary: Replace live-score
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/live-scoreCreate'
+      parameters:
+        - name: id
+          in: path
+          description: live-score id
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+      responses:
+        200:
+          description: Return replaced live-score
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/live-scoreRead'
+        401:
+          description: Return Authentication token exception
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppException'
+        404:
+          description: Return live-score not found exception
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppException'
+      security:
+        - bearerAuth: []
+    delete:
+      tags:
+        - live-score
+      description: Delete live-score
+      summary: Delete live-score
+      parameters:
+        - name: id
+          in: path
+          description: live-score id
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+      responses:
+        204:
+          description: Return void
+        401:
+          description: Return Authentication token exception
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppException'
+        403:
+          description: Return Not allowed role exception
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppException'
+        404:
+          description: Return live-score not found exception
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppException'
+      security:
+        - bearerAuth: []
