@@ -1,7 +1,7 @@
 import supertest from 'supertest';
 import { app } from '../app.js';
-import { livescores } from './livescore.database-mock.js';
-import { LivescoreModel } from './livescore.model.js';
+import { liveScores } from './live-score.mock.js';
+import { LiveScoreModel } from './live-score.model.js';
 import { sequelize } from '../common/database.config.js';
 import { users } from '../user/user.database-mock.js';
 import { UserModel } from '../user/user.model.js';
@@ -26,11 +26,11 @@ const securityHeaders = [
 
 beforeAll(async () => {
   await sequelize.sync();
-  await LivescoreModel.destroy({ truncate: true, restartIdentity: true });
-  for (const livescore of livescores) {
-    const model = await LivescoreModel.create({
-      title: livescore.title,
-      publicationDate: livescore.publicationDate
+  await LiveScoreModel.destroy({ truncate: true, restartIdentity: true });
+  for (const liveScore of liveScores) {
+    const model = await LiveScoreModel.create({
+      title: liveScore.title,
+      publicationDate: liveScore.publicationDate
     });
     existingIds.push(model.id);
   }
@@ -44,11 +44,11 @@ beforeAll(async () => {
   }
 });
 
-describe('GET /livescores', () => {
+describe('GET /live-scores', () => {
   describe('all', () => {
     it('should send a success response', done => {
       supertest(app)
-        .get('/livescores')
+        .get('/live-scores')
         .then(response => {
           expect(response.status).toBe(200);
         })
@@ -57,7 +57,7 @@ describe('GET /livescores', () => {
     });
     it('should send a response with all the items', done => {
       supertest(app)
-        .get('/livescores')
+        .get('/live-scores')
         .then(response => {
           expect(response.body).toBeInstanceOf(Array);
           expect(response.body.length).toBe(16);
@@ -67,7 +67,7 @@ describe('GET /livescores', () => {
     });
     it('should send a response with all structured items', done => {
       supertest(app)
-        .get('/livescores')
+        .get('/live-scores')
         .then(response => {
           response.body.forEach(item => {
             expect(item).toHaveProperty('id');
@@ -80,7 +80,7 @@ describe('GET /livescores', () => {
     });
     it('should send a response with security headers', done => {
       supertest(app)
-        .get('/livescores')
+        .get('/live-scores')
         .then(response => {
           securityHeaders.forEach(headerName => expect(response.headers[headerName]).toBeDefined());
           expect(response.headers['x-powered-by']).not.toBeDefined();
@@ -93,7 +93,7 @@ describe('GET /livescores', () => {
   describe('page', () => {
     it('should send a success response with first page of items', done => {
       supertest(app)
-        .get('/livescores?pageIndex=0&pageSize=5')
+        .get('/live-scores?pageIndex=0&pageSize=5')
         .then(response => {
           expect(response.status).toBe(200);
           expect(response.body).toBeInstanceOf(Array);
@@ -104,7 +104,7 @@ describe('GET /livescores', () => {
     });
     it('should send a success response with second page of items', done => {
       supertest(app)
-        .get('/livescores?pageIndex=1&pageSize=5')
+        .get('/live-scores?pageIndex=1&pageSize=5')
         .then(response => {
           expect(response.status).toBe(200);
           expect(response.body).toBeInstanceOf(Array);
@@ -115,7 +115,7 @@ describe('GET /livescores', () => {
     });
     it('should send a success response with third page of items', done => {
       supertest(app)
-        .get('/livescores?pageIndex=2&pageSize=5')
+        .get('/live-scores?pageIndex=2&pageSize=5')
         .then(response => {
           expect(response.status).toBe(200);
           expect(response.body).toBeInstanceOf(Array);
@@ -126,7 +126,7 @@ describe('GET /livescores', () => {
     });
     it('should send a success response with fourth page of items', done => {
       supertest(app)
-        .get('/livescores?pageIndex=3&pageSize=5')
+        .get('/live-scores?pageIndex=3&pageSize=5')
         .then(response => {
           expect(response.status).toBe(200);
           expect(response.body).toBeInstanceOf(Array);
@@ -137,7 +137,7 @@ describe('GET /livescores', () => {
     });
     it('should send a success response with fifth page items', done => {
       supertest(app)
-        .get('/livescores?pageIndex=4&pageSize=5')
+        .get('/live-scores?pageIndex=4&pageSize=5')
         .then(response => {
           expect(response.status).toBe(200);
           expect(response.body).toBeInstanceOf(Array);
@@ -148,7 +148,7 @@ describe('GET /livescores', () => {
     });
     it('should send a response with all items count for first page', done => {
       supertest(app)
-        .get('/livescores?pageIndex=0&pageSize=5')
+        .get('/live-scores?pageIndex=0&pageSize=5')
         .then(response => {
           expect(response.headers['x-total-count']).toEqual('16');
         })
@@ -157,7 +157,7 @@ describe('GET /livescores', () => {
     });
     it('should send a response with all items count for second page', done => {
       supertest(app)
-        .get('/livescores?pageIndex=1&pageSize=5')
+        .get('/live-scores?pageIndex=1&pageSize=5')
         .then(response => {
           expect(response.headers['x-total-count']).toEqual('16');
         })
@@ -166,7 +166,7 @@ describe('GET /livescores', () => {
     });
     it('should send a response with all items count for third page', done => {
       supertest(app)
-        .get('/livescores?pageIndex=2&pageSize=5')
+        .get('/live-scores?pageIndex=2&pageSize=5')
         .then(response => {
           expect(response.headers['x-total-count']).toEqual('16');
         })
@@ -175,7 +175,7 @@ describe('GET /livescores', () => {
     });
     it('should send a response with all items count for fourth page', done => {
       supertest(app)
-        .get('/livescores?pageIndex=3&pageSize=5')
+        .get('/live-scores?pageIndex=3&pageSize=5')
         .then(response => {
           expect(response.headers['x-total-count']).toEqual('16');
         })
@@ -184,7 +184,7 @@ describe('GET /livescores', () => {
     });
     it('should send a response with structured items', done => {
       supertest(app)
-        .get('/livescores?pageIndex=0&pageSize=5')
+        .get('/live-scores?pageIndex=0&pageSize=5')
         .then(response => {
           response.body.forEach(item => {
             expect(item).toHaveProperty('id');
@@ -197,7 +197,7 @@ describe('GET /livescores', () => {
     });
     it('should send a error response because of not natural page index', done => {
       supertest(app)
-        .get('/livescores?pageIndex=-1&pageSize=5')
+        .get('/live-scores?pageIndex=-1&pageSize=5')
         .then(response => {
           expect(response.status).toBe(400);
         })

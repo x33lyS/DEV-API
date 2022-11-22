@@ -2,8 +2,8 @@ import { userRepository } from './user.repository.js';
 import { mapToDto } from './user.mapper.js';
 
 class UserService {
-  findByCredentials = (login, pwd) => userRepository
-    .findByCredentials(login, pwd)
+  findByCredentials = (email, password) => userRepository
+    .findByCredentials(email, password)
     .then(model => mapToDto(model));
 }
 

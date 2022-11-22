@@ -13,7 +13,7 @@ const getSequelize = () => {
     dialect: 'mysql',
     host: 'mysql-b3-api.alwaysdata.net',
     port: 3306,
-    database: 'b3-api_db',
+    database: 'b3-api_tp-2',
     username: 'b3-api',
     password: 'b3-api-password',
   });

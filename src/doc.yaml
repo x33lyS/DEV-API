@@ -1,13 +1,13 @@
 openapi: 3.0.3
 info:
   title: Library API
-  description: Fetch and create your books
+  description: Fetch and create your live-scores
   version: 1.0.0
 tags:
   - name: auth
     description: Authentication operations
-  - name: book
-    description: Book CRUD operations
+  - name: live-score
+    description: live-score CRUD operations
 components:
   schemas:
     AuthenticationCredentials:
@@ -18,7 +18,7 @@ components:
       properties:
         username:
           type: string
-          example: user
+          example: admin@ynov.com
         password:
           type: string
           example: pwd
@@ -40,48 +40,82 @@ components:
           type: integer
         message:
           type: string
-    BookRead:
+    live-scoreRead:
       required:
         - id
-        - title
-        - publication
+        - date
+        - homeTeamName
+        - awayTeamName
+        - homeTeamScore
+        - awayTeamScore
       type: object
       properties:
         id:
           type: integer
           example: 1
-        title:
-          type: string
-          example: JavaScript pour les noobs
-        publication:
+        date:
           type: string
           format: date
           example: 1996-05-01
-    BookCreate:
+        homeTeamName:
+          type: string
+          example: Manchester United
+        awayTeamName:
+          type: string
+          example: Liverpool
+        homeTeamScore:
+            type: integer
+            example: 2
+        awayTeamScore:
+            type: integer
+            example: 1
+
+    live-scoreCreate:
       required:
-        - title
-        - publication
+        - date
+        - homeTeam
+        - awayTeam
+        - homeScore
+        - awayScore
       type: object
       properties:
-        title:
-          type: string
-          example: JavaScript pour les noobs
-        publication:
+        date:
           type: string
           format: date
           example: 1996-05-01
-    BookReplace:
-      $ref: '#/components/schemas/BookCreate'
-    BookUpdate:
+        homeTeamName:
+          type: string
+          example: Manchester United
+        awayTeamName:
+          type: string
+          example: Liverpool
+        homeTeamScore:
+          type: integer
+          example: 2
+        awayTeamScore:
+          type: integer
+          example: 1
+    live-scoreReplace:
+      $ref: '#/components/schemas/live-scoreCreate'
+    live-scoreUpdate:
       type: object
       properties:
-        title:
-          type: string
-          example: JavaScript pour les noobs
-        publication:
+        date:
           type: string
           format: date
           example: 1996-05-01
+        homeTeamName:
+          type: string
+          example: Manchester United
+        awayTeamName:
+          type: string
+          example: Liverpool
+        homeTeamScore:
+          type: integer
+          example: 2
+        awayTeamScore:
+          type: integer
+          example: 1
   securitySchemes:
     bearerAuth:
       type: http
@@ -111,12 +145,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AppException'
-  /books:
+  /live-scores:
     get:
       tags:
-        - book
-      description: Find books
-      summary: Find books
+        - live-score
+      description: Find live-scores
+      summary: Find live-scores
       parameters:
         - name: pageIndex
           in: query
@@ -134,7 +168,7 @@ paths:
             minimum: 1
       responses:
         200:
-          description: Returns a page of books
+          description: Returns a page of live-scores
           headers:
             x-total-count:
               description: Items total count
@@ -145,24 +179,24 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/BookRead'
+                  $ref: '#/components/schemas/live-scoreRead'
     post:
       tags:
-        - book
-      description: Create book
-      summary: Create book
+        - live-score
+      description: Create live-score
+      summary: Create live-score
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/BookCreate'
+              $ref: '#/components/schemas/live-scoreCreate'
       responses:
         201:
-          description: Return created book
+          description: Return created live-score
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BookRead'
+                $ref: '#/components/schemas/live-scoreRead'
         401:
           description: Return Authentication token exception
           content:
@@ -171,58 +205,58 @@ paths:
                 $ref: '#/components/schemas/AppException'
       security:
         - bearerAuth: []
-  /books/{id}:
+  /live-scores/{id}:
     get:
       tags:
-        - book
-      description: Find a book
-      summary: Find a book
+        - live-score
+      description: Find a live-score
+      summary: Find a live-score
       parameters:
         - name: id
           in: path
-          description: Book id
+          description: live-score id
           required: true
           schema:
             type: integer
             minimum: 0
       responses:
         200:
-          description: Return requested book
+          description: Return requested live-score
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BookRead'
+                $ref: '#/components/schemas/live-scoreRead'
         404:
-          description: Return Book not found exception
+          description: Return live-score not found exception
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AppException'
     patch:
       tags:
-        - book
-      description: Update book
-      summary: Update book
+        - live-score
+      description: Update live-score
+      summary: Update live-score
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/BookUpdate'
+              $ref: '#/components/schemas/live-scoreUpdate'
       parameters:
         - name: id
           in: path
-          description: Book id
+          description: live-score id
           required: true
           schema:
             type: integer
             minimum: 0
       responses:
         200:
-          description: Return updated book
+          description: Return updated live-score
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BookRead'
+                $ref: '#/components/schemas/live-scoreRead'
         401:
           description: Return Authentication token exception
           content:
@@ -230,7 +264,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/AppException'
         404:
-          description: Return Book not found exception
+          description: Return live-score not found exception
           content:
             application/json:
               schema:
@@ -239,29 +273,29 @@ paths:
         - bearerAuth: []
     put:
       tags:
-        - book
-      description: Replace book
-      summary: Replace book
+        - live-score
+      description: Replace live-score
+      summary: Replace live-score
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/BookCreate'
+              $ref: '#/components/schemas/live-scoreCreate'
       parameters:
         - name: id
           in: path
-          description: Book id
+          description: live-score id
           required: true
           schema:
             type: integer
             minimum: 0
       responses:
         200:
-          description: Return replaced book
+          description: Return replaced live-score
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BookRead'
+                $ref: '#/components/schemas/live-scoreRead'
         401:
           description: Return Authentication token exception
           content:
@@ -269,7 +303,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/AppException'
         404:
-          description: Return Book not found exception
+          description: Return live-score not found exception
           content:
             application/json:
               schema:
@@ -278,13 +312,13 @@ paths:
         - bearerAuth: []
     delete:
       tags:
-        - book
-      description: Delete book
-      summary: Delete book
+        - live-score
+      description: Delete live-score
+      summary: Delete live-score
       parameters:
         - name: id
           in: path
-          description: Book id
+          description: live-score id
           required: true
           schema:
             type: integer
@@ -305,7 +339,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/AppException'
         404:
-          description: Return Book not found exception
+          description: Return live-score not found exception
           content:
             application/json:
               schema:

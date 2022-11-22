@@ -5,11 +5,12 @@ export class UserModel extends Model {
 }
 
 UserModel.init({
-  login: {
+  email: {
     type: DataTypes.STRING,
     allowNull: false,
+    unique: true,
   },
-  pwd: {
+  password: {
     type: DataTypes.STRING,
     allowNull: false,
   },

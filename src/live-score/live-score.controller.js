@@ -1,6 +1,6 @@
-import { livescoreService } from './livescore.service.js';
+import { livescoreService } from './live-score.service.js';
 
-class LivescoreController {
+class LiveScoreController {
   findPage = (request, response, next) => {
     livescoreService.findPage(request.query.pageIndex, request.query.pageSize)
       .then(({ items, totalCount }) => {
@@ -20,6 +20,7 @@ class LivescoreController {
     livescoreService.create(request.body)
       .then(item => response.status(201).json(item))
       .catch(next);
+
   };
 
   update = (request, response, next) => {
@@ -40,4 +41,4 @@ class LivescoreController {
       .catch(next);
   };
 }
-export const livescoreController = new LivescoreController();
+export const livescoreController = new LiveScoreController();

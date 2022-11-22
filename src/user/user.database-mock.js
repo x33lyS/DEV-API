@@ -1,12 +1,12 @@
 export const users = [
   {
-    login: 'admin',
-    pwd: 'pwd',
+    email: 'admin@ynov.com',
+    password: 'pwd',
     role: 'admin',
   },
   {
-    login: 'user',
-    pwd: 'pwd',
+    email: 'user@ynov.com',
+    password: 'pwd',
     role: 'contributor',
   },
 ];

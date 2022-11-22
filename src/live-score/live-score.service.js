@@ -1,10 +1,10 @@
-import { bookRepository } from './book.repository.js';
-import { mapFromDto, mapFromPartialDto, mapToDto } from './book.mapper.js';
+import { livescoreRepository } from './live-score.repository.js';
+import { mapFromDto, mapFromPartialDto, mapToDto } from './live-score.mapper.js';
 
-class BookService {
+class LiveScoreService {
   findPage = (pageIndex, pageSize) => {
     if (!pageIndex && !pageSize) {
-      return bookRepository.findAll()
+      return livescoreRepository.findAll()
         .then(models => ({
           items: models.map(mapToDto),
           totalCount: models.length,
@@ -12,7 +12,7 @@ class BookService {
     }
     pageIndex = Number(pageIndex);
     pageSize = Number(pageSize);
-    return bookRepository.findByPage(pageIndex * pageSize, pageSize)
+    return livescoreRepository.findByPage(pageIndex * pageSize, pageSize)
       .then(({ items, count }) => ({
         items: items.map(mapToDto),
         totalCount: count,
@@ -21,12 +21,12 @@ class BookService {
 
   findById = id => Promise.resolve(id)
     .then(id => Number(id))
-    .then(id => bookRepository.findById(id))
+    .then(id => livescoreRepository.findById(id))
     .then(model => mapToDto(model));
 
   create = dto => Promise.resolve(dto)
     .then(dto => mapFromDto(dto))
-    .then(model => bookRepository.create(model))
+    .then(model => livescoreRepository.create(model))
     .then(model => mapToDto(model));
 
   update = (id, partialDto) => Promise.resolve({ id, partialDto })
@@ -34,7 +34,7 @@ class BookService {
       id: Number(id),
       model: mapFromPartialDto(partialDto),
     }))
-    .then(({ id, model }) => bookRepository.update(id, model))
+    .then(({ id, model }) => livescoreRepository.update(id, model))
     .then(model => mapToDto(model));
 
   replace = (id, dto) => Promise.resolve({ id, dto })
@@ -42,13 +42,13 @@ class BookService {
       id: Number(id),
       model: mapFromDto(dto),
     }))
-    .then(({ id, model }) => bookRepository.replace(id, model))
+    .then(({ id, model }) => livescoreRepository.replace(id, model))
     .then(model => mapToDto(model));
 
   remove = id => Promise.resolve(id)
     .then(id => Number(id))
-    .then(id => bookRepository.remove(id))
+    .then(id => livescoreRepository.remove(id))
     .then(() => undefined);
 }
 
-export const bookService = new BookService();
+export const livescoreService = new LiveScoreService();
